@@ -55,4 +55,8 @@ pub impl FontListHandle {
             family.entries.push(entry)
         }
     }
+
+    fn get_last_resort_font_family() -> ~str {
+        ~"Arial"
+    }
 }

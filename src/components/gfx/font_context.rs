@@ -112,13 +112,13 @@ pub impl<'self> FontContext {
 
         debug!("(create font group) --- starting ---");
 
+        let list = self.get_font_list();
+
         // TODO(Issue #193): make iteration over 'font-family' more robust.
         for str::each_split_char(style.families, ',') |family| {
             let family_name = str::trim(family);
             let transformed_family_name = self.transform_family(family_name);
             debug!("(create font group) transformed family is `%s`", transformed_family_name);
-
-            let list = self.get_font_list();
 
             let result = list.find_font_in_family(transformed_family_name, style);
             let mut found = false;
@@ -132,6 +132,21 @@ pub impl<'self> FontContext {
             if !found {
                 debug!("(create font group) didn't find `%s`", transformed_family_name);
             }
+        }
+
+        let last_resort = FontList::get_last_resort_font_family();
+        let transformed_last_resort = self.transform_family(last_resort);
+        let mut found = false;
+        debug!("(transformed_last_resort): `%s`", transformed_last_resort);
+        let result = list.find_font_in_family(transformed_last_resort, style);
+        for result.each |font_entry| {
+            found = true;
+            let instance = Font::new_from_existing_handle(self, &font_entry.handle, style, self.backend);
+            do result::iter(&instance) |font: &@mut Font| { fonts.push(*font); }	
+        }
+
+        if !found {
+            debug!("(create font group) didn't find last-resort font `%s`", transformed_last_resort);	
         }
 
         assert!(fonts.len() > 0);

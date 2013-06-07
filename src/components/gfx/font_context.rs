@@ -133,16 +133,16 @@ pub impl<'self> FontContext {
                 debug!("(create font group) didn't find `%s`", transformed_family_name);
             }
         }
-		
-		let last_resort = FontList::get_last_resort_font_families();
-		
-		for last_resort.each |family| {
-			let result = list.find_font_in_family(*family,style);
-			for result.each |font_entry| {
-				let instance = Font::new_from_existing_handle(self, &font_entry.handle, style, self.backend);
-				do result::iter(&instance) |font: &@mut Font| { fonts.push(*font); }
-			}
-		}
+
+        let last_resort = FontList::get_last_resort_font_families();
+
+        for last_resort.each |family| {
+            let result = list.find_font_in_family(*family,style);
+            for result.each |font_entry| {
+                let instance = Font::new_from_existing_handle(self, &font_entry.handle, style, self.backend);
+                do result::iter(&instance) |font: &@mut Font| { fonts.push(*font); }
+            }
+        }
 
         assert!(fonts.len() > 0);
         // TODO(Issue #179): Split FontStyle into specified and used styles
